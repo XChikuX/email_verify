@@ -1,5 +1,6 @@
 from typing import Tuple
 from fastapi import FastAPI
+from fastapi.responses import FileResponse
 from pydantic import BaseModel, EmailStr
 import dns.resolver
 from disposable_email_domains import blocklist
@@ -97,6 +98,11 @@ app = FastAPI()
 @app.get("/")
 async def root():
     return {"message": "Hello World"}
+
+@app.get("/favicon.ico")
+async def favicon() -> FileResponse:
+    return FileResponse("favicon.ico")
+
 
 @app.post("/verify_email")
 async def verify_email(email: Email) -> dict:
