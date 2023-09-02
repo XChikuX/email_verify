@@ -16,6 +16,7 @@ disposable-email-domains = "^0.0.95"
 pydantic = {extras = ["email"], version = "^2.3.0"}
 hypercorn = "^0.14.4"
 anyio = "^4.0.0"
+pendulum = "^3.0.0a1"
 
 [tool.poetry.group.dev.dependencies]
 mypy = "^1.5.1"
