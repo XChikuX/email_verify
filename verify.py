@@ -3,6 +3,11 @@ from fastapi import FastAPI
 from pydantic import BaseModel, EmailStr
 import dns.resolver
 from disposable_email_domains import blocklist
+import asyncio
+from hypercorn.config import Config
+from hypercorn.asyncio import serve
+
+
 
 import smtplib
 import socket
@@ -109,3 +114,5 @@ async def verify_email(email: Email) -> dict:
             return {"is_valid": False, "message": message}
     
     return {"is_valid": True, "message": "Email is valid."}
+
+asyncio.run(serve(app, Config())) # type: ignore
