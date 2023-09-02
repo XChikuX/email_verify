@@ -4,15 +4,12 @@ from fastapi.responses import FileResponse
 from pydantic import BaseModel, EmailStr
 import dns.resolver
 from disposable_email_domains import blocklist
-import asyncio
-from hypercorn.config import Config
-from hypercorn.asyncio import serve
+# import asyncio
+# from hypercorn.config import Config
+# from hypercorn.asyncio import serve
 
-
-
-import smtplib
-import socket
-
+# import smtplib
+# import socket
 
 async def email_deduplication_and_spam_trap_removal(email: EmailStr, domain: str) -> Tuple[bool, str]:
     if domain in blocklist:
@@ -43,7 +40,7 @@ async def mta_validation(email: EmailStr, domain: str) -> Tuple[bool, str]:
     except (dns.resolver.NXDOMAIN, dns.resolver.NoAnswer):
         return False, "MX record not found for the domain."
 
-
+'''
 async def check_email_deliverability(email: EmailStr, domain: str):
     
     # Perform DNS lookup for MX records
@@ -88,6 +85,8 @@ async def check_email_deliverability(email: EmailStr, domain: str):
             continue
     
     return False, "Could not connect to any mail server."
+'''
+
 
 ##### START HERE########
 class Email(BaseModel):
@@ -121,4 +120,4 @@ async def verify_email(email: Email) -> dict:
     
     return {"is_valid": True, "message": "Email is valid."}
 
-asyncio.run(serve(app, Config())) # type: ignore
+# asyncio.run(serve(app, Config())) # type: ignore
