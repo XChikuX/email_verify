@@ -4,6 +4,4 @@ dnspython>=2.4.2
 fastapi>=0.103.0
 disposable-email-domains>=0.0.95
 pydantic[email]>=2.3.0
-anyio>=4.0.0
 hypercorn>=0.14.4
-pendulum>=3.0.0a1
