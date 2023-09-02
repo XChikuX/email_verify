@@ -7,7 +7,7 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisites
 
-- Python 3.6+
+- Python 3.9+
 - FastAPI
 - Hypercorn
 
@@ -18,14 +18,16 @@ These instructions will get you a copy of the project up and running on your loc
     git clone https://github.com/yourusername/yourrepository.git
     ```
 
-2. **Navigate to the project directory:**
+2. **Create a python virtual environment:**
     ```bash
-    cd yourrepository
+    python3 -m venv .env
+    source .env/bin/activate
     ```
 
 3. **Install the required packages:**
     ```bash
-    pip install -r requirements.txt
+    pip install poetry
+    poetry install
     ```
 
 ### Running the Server
