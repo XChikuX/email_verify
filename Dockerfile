@@ -23,4 +23,4 @@ COPY verify.py .
 COPY --from=build /usr/local/lib/python3.12/site-packages/ /usr/local/lib/python3.12/site-packages/
 
 # Set the entrypoint
-ENTRYPOINT [ "python3", "-m", "hypercorn", "verify:app", "--bind", "0.0.0.0:1234"]
+ENTRYPOINT [ "python3", "-m", "hypercorn", "verify:app", "--bind", "0.0.0.0:8080"]

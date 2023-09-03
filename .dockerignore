@@ -1,0 +1,9 @@
+# flyctl launch added from .gitignore
+**/*pycache*
+**/*.env*
+**/poetry.lock
+
+# flyctl launch added from .mypy_cache/.gitignore
+# Automatically created by mypy
+.mypy_cache/**/*
+fly.toml
