@@ -4,7 +4,7 @@
 #
 
 app = "email-checker"
-primary_region = "jnb"
+primary_region = "atl"
 
 [build]
 
