@@ -6,9 +6,18 @@ import dns.resolver
 from disposable_email_domains import blocklist
 
 
-async def email_deduplication_and_spam_trap_removal(email: EmailStr, domain: str) -> Tuple[bool, str]:
+import sentry_sdk
+sentry_sdk.init(
+    dsn="https://fe6d70b9d474c1d27e46b48a72cd4593\
+        @o4504830500012032.ingest.sentry.io/4505820941254656",
+    traces_sample_rate=0.25,
+    profiles_sample_rate=0.25,
+)
+
+
+async def deduplication_and_spam_removal(email: EmailStr, domain: str) -> Tuple[bool, str]:
     if domain in blocklist:
-        return False, "Email domain is in the blocklist of invalid or disposable emails."
+        return False, "Email domain is in the blocklist of invalid, disposable emails."
     return True, ""
 
 async def domain_validation(email: EmailStr, domain: str) -> Tuple[bool, str]:
@@ -37,7 +46,8 @@ async def mta_validation(email: EmailStr, domain: str) -> Tuple[bool, str]:
 
 
 
-##### START HERE########
+##### MAIN APP########
+
 class Email(BaseModel):
     email: EmailStr
 
@@ -55,7 +65,7 @@ async def favicon() -> FileResponse:
 @app.post("/verify_email")
 async def verify_email(email: Email) -> dict:
     steps = [
-        email_deduplication_and_spam_trap_removal,
+        deduplication_and_spam_removal,
         domain_validation,
         risk_validation,
         mta_validation,

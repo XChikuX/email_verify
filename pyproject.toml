@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "email-verify"
-version = "0.1.0"
+version = "0.99.0"
 description = "Check emails?"
 authors = ["Srikanth Gopalakrishnan <srikanth.gokr@gmail.com>"]
 license = "MIT"
@@ -11,10 +11,11 @@ python = "^3.9"
 charset-normalizer = "^3.1.0"  # Needed cause of a bug in poetry
 urllib3 = "^1.26.16"  # Needed cause of a bug in poetry
 dnspython = "^2.4.2"
-fastapi = "^0.103.0"
+fastapi = "^0.103.1"
 disposable-email-domains = "^0.0.95"
 pydantic = {extras = ["email"], version = "^2.3.0"}
 hypercorn = "^0.14.4"
+sentry-sdk = {extras = ["fastapi"], version = "^1.30.0"}
 
 [tool.poetry.group.dev.dependencies]
 mypy = "^1.5.1"
