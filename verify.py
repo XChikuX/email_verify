@@ -1,9 +1,16 @@
-from typing import Tuple
+
 from fastapi import FastAPI
 from fastapi.responses import FileResponse
 from pydantic import BaseModel, EmailStr
-import dns.resolver
-from disposable_email_domains import blocklist
+from contextlib import asynccontextmanager
+from common import (
+    logger,
+    deduplication_and_spam_removal,
+    domain_validation,
+    risk_validation,
+    mta_validation,
+    check_email_deliverability
+)
 
 
 import sentry_sdk
@@ -15,43 +22,24 @@ sentry_sdk.init(
 )
 
 
-async def deduplication_and_spam_removal(email: EmailStr, domain: str) -> Tuple[bool, str]:
-    if domain in blocklist:
-        return False, "Email domain is in the blocklist of invalid, disposable emails."
-    return True, ""
-
-async def domain_validation(email: EmailStr, domain: str) -> Tuple[bool, str]:
-    
-    try:
-        dns.resolver.resolve(domain, 'A')
-        return True, ""
-    except dns.resolver.NXDOMAIN:
-        return False, "DNS entry not found for the domain."
-
-async def risk_validation(email: EmailStr, domain: str) -> Tuple[bool, str]:
-    
-    # Replace with your high-risk email database check
-    return True, ""
-
-async def mta_validation(email: EmailStr, domain: str) -> Tuple[bool, str]:
-    
-    try:
-        mx_records = dns.resolver.resolve(domain, 'MX')
-        for mx in mx_records:  # type: ignore
-            if mx.preference == 0:
-                return False, "Catch-all address detected."
-        return True, ""
-    except (dns.resolver.NXDOMAIN, dns.resolver.NoAnswer):
-        return False, "MX record not found for the domain."
-
 
 
 ##### MAIN APP########
-
 class Email(BaseModel):
     email: EmailStr
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Load the FastAPI app
+    logger.info("[bold green blink]Server is Starting Up![/]", extra={"markup": True})
+    yield
+    # Clean up the ML models and release the resources
+    logger.info(
+        "[bold blue blink]Server is Shutting Down Gracefully![/]",
+        extra={"markup": True},
+    )
+
+app = FastAPI(title="Email Verify", lifespan=lifespan)
 
 @app.get("/")
 async def root():

@@ -16,6 +16,7 @@ disposable-email-domains = "^0.0.95"
 pydantic = {extras = ["email"], version = "^2.3.0"}
 hypercorn = "^0.14.4"
 sentry-sdk = {extras = ["fastapi"], version = "^1.30.0"}
+rich = "^13.5.2"
 
 [tool.poetry.group.dev.dependencies]
 mypy = "^1.5.1"
