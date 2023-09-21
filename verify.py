@@ -5,6 +5,8 @@ from pydantic import BaseModel, EmailStr
 from contextlib import asynccontextmanager
 from common import (
     logger,
+    AsyncEmailCache,
+    Tuple,
     deduplication_and_spam_removal,
     domain_validation,
     risk_validation,
@@ -50,20 +52,32 @@ async def favicon() -> FileResponse:
     return FileResponse("favicon.ico")
 
 
-@app.post("/verify_email")
-async def verify_email(email: Email) -> dict:
+# Step 1: Create a new async function to handle the original email verification logic
+async def process_email(email_address: str) -> Tuple[bool, str]:
+    domain = email_address.split('@')[1]
     steps = [
         deduplication_and_spam_removal,
         domain_validation,
         risk_validation,
         mta_validation,
-        # check_email_deliverability
+        check_email_deliverability
     ]
-    domain = email.email.split('@')[1]
-    for step in steps:
-        is_valid, message = await step(email.email, domain)
-        if not is_valid:
-            return {"result": "invalid", "message": message}
     
-    return {"result": "valid", "message": "Email is valid."}
+    for step in steps:
+        is_valid, message = await step(email_address, domain)
+        if not is_valid:
+            return False, message
+    
+    return True, "Email is valid."
 
+# Step 2: Initialize an instance of AsyncEmailCache with process_email as the awaitable
+email_cache = AsyncEmailCache(process_email)
+
+@app.post("/verify_email")
+async def verify_email(email: Email) -> dict:
+    # Step 3: Update the verify_email route to use the cache
+    is_valid:bool = False
+    message: str = ""
+    is_valid, message = await email_cache(email.email) # type: ignore
+    result = "valid" if is_valid else "invalid"
+    return {"result": result, "message": message}

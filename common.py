@@ -1,10 +1,12 @@
-from typing import Tuple
+from typing import Tuple, Dict, Callable, Awaitable
 import dns.resolver
 from disposable_email_domains import blocklist
 import smtplib
 import socket
 import logging
 from rich.logging import RichHandler
+import anyio
+import pendulum
 
 FORMAT = "[<->] %(asctime)s |%(process)d| %(message)s"
 
@@ -16,6 +18,40 @@ logging.basicConfig(
 )
 
 logger = logging.getLogger("rich")
+
+
+# Tiered Cache
+class AsyncEmailCache:
+    def __init__(self, awaitable: Callable[..., Awaitable]):
+        self._awaitable = awaitable
+        self._cache: Dict[str, Dict[str, bool]] = {}  # {domain: {email: is_valid}}
+        self._timestamps: Dict[str, Dict[str, pendulum.DateTime]] = {}  # {domain: {email: timestamp}}
+        self._lock = anyio.Lock()
+
+    async def __call__(self, email: str) -> bool:
+        domain = email.split('@')[-1]
+        async with self._lock:
+            if domain not in self._cache:
+                self._cache[domain] = {}
+                self._timestamps[domain] = {}
+
+            # Check if the email is in the cache and not older than 8 hours
+            if (
+                email not in self._cache[domain]
+                or pendulum.now() - self._timestamps[domain]
+                .get(email, pendulum.now()) > pendulum.duration(hours=8)
+            ):
+                # If not, then verify the email
+                is_valid = await self._awaitable(email)
+                self._cache[domain][email] = is_valid
+                self._timestamps[domain][email] = pendulum.now()
+            return self._cache[domain][email]
+
+    def invalidate(self, email: str):
+        domain = email.split('@')[-1]
+        if domain in self._cache and email in self._cache[domain]:
+            del self._cache[domain][email]
+            del self._timestamps[domain][email]
 
 
 async def deduplication_and_spam_removal(email: str, domain: str) -> Tuple[bool, str]:
@@ -78,6 +114,14 @@ async def network_calls(mx, email, timeout=3):
         logger.debug(f'{mx} answer: {status} - {_}\n')
         smtp.quit()
 
+    except dns.resolver.LifetimeTimeout:
+        logger.debug(f'DNS Timed out connecting to {mx} Check your DNS resolver.\n')
+    except smtplib.SMTPRecipientsRefused:
+        logger.debug(f'{mx} refused recipient.\n')
+    except smtplib.SMTPHeloError:
+        logger.debug(f'{mx} refused HELO.\n')
+    except smtplib.SMTPSenderRefused:
+        logger.debug(f'{mx} refused sender.\n')
     except smtplib.SMTPServerDisconnected:
         logger.debug(f'Server does not permit verify user, {mx} disconnected.\n')
     except smtplib.SMTPConnectError:

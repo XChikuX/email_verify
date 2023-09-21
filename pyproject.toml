@@ -17,6 +17,7 @@ pydantic = {extras = ["email"], version = "^2.3.0"}
 hypercorn = "^0.14.4"
 sentry-sdk = {extras = ["fastapi"], version = "^1.30.0"}
 rich = "^13.5.2"
+pendulum = "3.0.0a1"
 
 [tool.poetry.group.dev.dependencies]
 mypy = "^1.5.1"
