@@ -1,6 +1,8 @@
 
 from fastapi import FastAPI
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, ORJSONResponse
+from fastapi.middleware.cors import CORSMiddleware
+from brotli_asgi import BrotliMiddleware
 from pydantic import BaseModel, EmailStr
 from contextlib import asynccontextmanager
 from common import (
@@ -13,7 +15,6 @@ from common import (
     mta_validation,
     check_email_deliverability
 )
-
 
 import sentry_sdk
 sentry_sdk.init(
@@ -41,13 +42,35 @@ async def lifespan(app: FastAPI):
         extra={"markup": True},
     )
 
-app = FastAPI(title="Email Verify", lifespan=lifespan)
+origins = [
+    "https://psync.dev",
+    "https://psync.club",
+    "https://psy.nc",
+    "https://psync.app",
+    "https://psyncapp.com",
+    "https://thedating.club",
+    "https://gsrikanth.cc",
+]
 
-@app.get("/")
+trampoline = FastAPI(title="Trampoline", lifespan=lifespan)
+
+# Enable CORS
+trampoline.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+	allow_headers=["*"],
+    max_age=3600,
+)
+# Enable Brotli compression
+trampoline.add_middleware(BrotliMiddleware)
+
+@trampoline.get("/")
 async def root():
     return {"message": "Hello World"}
 
-@app.get("/favicon.ico")
+@trampoline.get("/favicon.ico")
 async def favicon() -> FileResponse:
     return FileResponse("favicon.ico")
 
@@ -73,11 +96,11 @@ async def process_email(email_address: str) -> Tuple[bool, str]:
 # Step 2: Initialize an instance of AsyncEmailCache with process_email as the awaitable
 email_cache = AsyncEmailCache(process_email)
 
-@app.post("/verify_email")
-async def verify_email(email: Email) -> dict:
+@trampoline.post("/verify_email")
+async def verify_email(email: Email) -> ORJSONResponse:
     # Step 3: Update the verify_email route to use the cache
     is_valid:bool = False
     message: str = ""
     is_valid, message = await email_cache(email.email) # type: ignore
     result = "valid" if is_valid else "invalid"
-    return {"result": result, "message": message}
+    return ORJSONResponse({"result": result, "message": message})

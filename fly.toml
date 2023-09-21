@@ -3,7 +3,7 @@
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = "email-checker"
+app = "trampoline"
 primary_region = "atl"
 
 [build]
@@ -14,4 +14,4 @@ primary_region = "atl"
   auto_stop_machines = true
   auto_start_machines = true
   min_machines_running = 0
-  processes = ["app"]
+  processes = ["trampoline"]
