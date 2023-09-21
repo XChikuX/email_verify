@@ -18,8 +18,8 @@ from common import (
 
 import sentry_sdk
 sentry_sdk.init(
-    dsn="https://fe6d70b9d474c1d27e46b48a72cd4593\
-        @o4504830500012032.ingest.sentry.io/4505820941254656",
+    dsn="https://ab18ed27c74dec467fdcab9eccf383b2\
+        @o4505872417554432.ingest.sentry.io/4505872417751040",
     traces_sample_rate=0.25,
     profiles_sample_rate=0.25,
 )
