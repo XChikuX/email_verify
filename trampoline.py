@@ -25,8 +25,6 @@ sentry_sdk.init(
 )
 
 
-
-
 ##### MAIN APP########
 class Email(BaseModel):
     email: EmailStr
