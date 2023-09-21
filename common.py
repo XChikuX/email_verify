@@ -32,6 +32,8 @@ class AsyncEmailCache:
         domain = email.split('@')[-1]
         async with self._lock:
             if domain not in self._cache:
+                # Keep Track of the failure rate for each domain
+                # If the failure rate is high, then we can add a PR to the blocklist
                 self._cache[domain] = {}
                 self._timestamps[domain] = {}
 
