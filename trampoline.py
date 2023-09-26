@@ -94,6 +94,7 @@ async def process_email(email_address: str) -> Tuple[bool, str]:
 # Step 2: Initialize an instance of AsyncEmailCache with process_email as the awaitable
 email_cache = AsyncEmailCache(process_email)
 
+# Rate limit this using: https://slowapi.readthedocs.io/en/latest/
 @trampoline.post("/verify_email")
 async def verify_email(email: Email) -> ORJSONResponse:
     # Step 3: Update the verify_email route to use the cache
