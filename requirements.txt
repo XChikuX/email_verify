@@ -4,7 +4,7 @@ dnspython>=2.4.2
 
 fastapi>=0.103.1
 disposable-email-domains>=0.0.95
-pydantic[email]>=2.3.0
+pydantic[email]>=2.4.1
 hypercorn>=0.14.4
 sentry-sdk[fastapi]>=1.31.0
 rich>=13.5.3
