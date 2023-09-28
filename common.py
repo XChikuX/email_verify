@@ -66,7 +66,7 @@ async def domain_validation(email: str, domain: str) -> Tuple[bool, str]:
     try:
         dns.resolver.resolve(domain, 'A')
         return True, ""
-    except dns.resolver.NXDOMAIN:
+    except (dns.resolver.NXDOMAIN, dns.resolver.LifetimeTimeout):
         return False, "DNS entry not found for the domain."
 
 async def risk_validation(email: str, domain: str) -> Tuple[bool, str]:
@@ -77,12 +77,12 @@ async def risk_validation(email: str, domain: str) -> Tuple[bool, str]:
 async def mta_validation(email: str, domain: str) -> Tuple[bool, str]:
     
     try:
-        mx_records = dns.resolver.resolve(domain, 'MX')
+        mx_records = dns.resolver.resolve(domain, 'MX')  # TODO: Cache this and use it in check_email_deliverability
         for mx in mx_records:  # type: ignore
             if mx.preference == 0:
                 return False, "Catch-all address detected."
         return True, ""
-    except (dns.resolver.NXDOMAIN, dns.resolver.NoAnswer):
+    except (dns.resolver.NXDOMAIN, dns.resolver.NoAnswer, dns.resolver.LifetimeTimeout):
         return False, "MX record not found for the domain."
 
 async def check_email_deliverability(email: str, domain: str) -> Tuple[bool, str]:
