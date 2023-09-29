@@ -2,6 +2,7 @@ from typing import Tuple, Dict, Callable, Awaitable
 import dns.asyncresolver as DNSResolver, dns.resolver as DNS
 from disposable_email_domains import blocklist
 import aiosmtplib
+import asyncio
 import smtplib
 import socket
 import logging
@@ -198,3 +199,15 @@ async def network_calls(mx, email, port=25, timeout=3, use_tls=False):
         return None
 
     return result
+
+
+async def send_mail_async():
+    # Test the email address
+    smtp = aiosmtplib.SMTP(hostname="gmail.com", port=25, timeout=3)
+    await smtp.connect()
+    await smtp.starttls()
+
+if __name__ == "__main__":
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(asyncio.gather(send_mail_async()))
+    loop.close()
