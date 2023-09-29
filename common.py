@@ -125,7 +125,8 @@ async def network_calls(mx, email, port=25, timeout=3, use_tls=False):
 
     #     # Upgrade the connection to TLS using STARTTLS
     #     if port == 587:
-    #         starttls_response = await smtp.starttls()
+    #         starttls_response = await smtp.starttls(validate_certs=False)
+    #         # starttls_response = await smtp.starttls()
     #         if starttls_response.code != 220:
     #             await smtp.quit()
     #             logger.debug(f'{mx} answer: {starttls_response.code} - {starttls_response.message.decode()}\n')
