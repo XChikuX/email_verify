@@ -9,6 +9,7 @@ from common import (
     logger,
     AsyncEmailCache,
     Tuple,
+    MXRecord,
     deduplication_and_spam_removal,
     domain_validation,
     risk_validation,
@@ -75,7 +76,6 @@ async def favicon() -> FileResponse:
 
 # Step 1: Create a new async function to handle the original email verification logic
 async def process_email(email_address: str) -> Tuple[bool, str]:
-    domain = email_address.split('@')[1]
     steps = [
         deduplication_and_spam_removal,
         domain_validation,
@@ -83,9 +83,9 @@ async def process_email(email_address: str) -> Tuple[bool, str]:
         mta_validation,
         check_email_deliverability
     ]
-    
+    mx = MXRecord(email_address)
     for step in steps:
-        is_valid, message = await step(email_address, domain)
+        is_valid, message = await step(mx)
         if not is_valid:
             return False, message
     

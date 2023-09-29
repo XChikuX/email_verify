@@ -1,5 +1,5 @@
 from typing import Tuple, Dict, Callable, Awaitable
-import dns.resolver
+import dns.asyncresolver as DNSResolver, dns.resolver as DNS
 from disposable_email_domains import blocklist
 import smtplib
 import socket
@@ -11,7 +11,7 @@ import pendulum
 FORMAT = "[<->] %(asctime)s |%(process)d| %(message)s"
 
 logging.basicConfig(
-    level="NOTSET",
+    level="INFO",
     format=FORMAT,
     datefmt="%Y-%m-%d %H:%M:%S %z",
     handlers=[RichHandler()],
@@ -19,6 +19,24 @@ logging.basicConfig(
 
 logger = logging.getLogger("rich")
 
+
+class MXRecord:
+    def __init__(self, email_address:str):
+        self.email = email_address
+        self.domain = email_address.split('@')[1]
+        self.records:DNS.Answer = None  # type: ignore
+    async def resolve(self):
+        # Check if the records are already resolved
+        if not self.records:
+            try:
+                mx_records = await DNSResolver.resolve(self.domain, 'MX')
+            except (DNS.NXDOMAIN, DNS.NoAnswer, DNS.LifetimeTimeout):
+                raise Exception("DNS entry not found for the domain.")
+            else:
+                # Prioritize the MX records in the middle of the list
+                mx_records = sorted(mx_records, key=lambda x: x.preference)  # type: ignore
+                mid_index = len(mx_records) // 2
+                self.records = mx_records[mid_index-1:mid_index+2]
 
 # Tiered Cache
 class AsyncEmailCache:
@@ -56,42 +74,38 @@ class AsyncEmailCache:
             del self._timestamps[domain][email]
 
 
-async def deduplication_and_spam_removal(email: str, domain: str) -> Tuple[bool, str]:
-    if domain in blocklist:
+async def deduplication_and_spam_removal(mx: MXRecord) -> Tuple[bool, str]:
+    if mx.domain in blocklist:
         return False, "Email domain is in the blocklist of invalid, disposable emails."
     return True, ""
 
-async def domain_validation(email: str, domain: str) -> Tuple[bool, str]:
-    
+async def domain_validation(mx: MXRecord) -> Tuple[bool, str]:
     try:
-        dns.resolver.resolve(domain, 'A')
+        await DNSResolver.resolve(mx.domain, 'A')
         return True, ""
-    except (dns.resolver.NXDOMAIN, dns.resolver.LifetimeTimeout):
+    except (DNS.NXDOMAIN, DNS.LifetimeTimeout):
         return False, "DNS entry not found for the domain."
 
-async def risk_validation(email: str, domain: str) -> Tuple[bool, str]:
+async def risk_validation(mx: MXRecord) -> Tuple[bool, str]:
     
     # Replace with your high-risk email database check
     return True, ""
 
-async def mta_validation(email: str, domain: str) -> Tuple[bool, str]:
-    
-    try:
-        mx_records = dns.resolver.resolve(domain, 'MX')  # TODO: Cache this and use it in check_email_deliverability
-        for mx in mx_records:  # type: ignore
-            if mx.preference == 0:
-                return False, "Catch-all address detected."
-        return True, ""
-    except (dns.resolver.NXDOMAIN, dns.resolver.NoAnswer, dns.resolver.LifetimeTimeout):
-        return False, "MX record not found for the domain."
+async def mta_validation(mx: MXRecord) -> Tuple[bool, str]:
+    await mx.resolve()
+    for mx in mx.records: # type: ignore
+        if mx.preference == 0: # type: ignore
+            return False, "Catch-all address detected."
+    return True, ""
 
-async def check_email_deliverability(email: str, domain: str) -> Tuple[bool, str]:
-    mx_records = dns.resolver.resolve(domain, 'MX')
-    for mx in mx_records:  # type: ignore
+
+async def check_email_deliverability(MX: MXRecord) -> Tuple[bool, str]:
+    await MX.resolve()
+    for mx in MX.records:  # type: ignore
         # Extracting the exchange attribute from the mx object
-        mail_server = str(mx.exchange).rstrip('.')
-        logger.info(f"Pinging: {mail_server}")
-        if await network_calls(mail_server, email):
+        mail_server = str(mx.exchange).rstrip('.')  # type: ignore
+        logger.debug(f"Pinging: {mail_server}")
+        if await network_calls(mail_server, MX.email):
             return True, ""
     return False, "Email address is not deliverable."
 
@@ -116,8 +130,7 @@ async def network_calls(mx, email, timeout=3):
         logger.debug(f'{mx} answer: {status} - {_}\n')
         smtp.quit()
 
-    except dns.resolver.LifetimeTimeout:
-        logger.debug(f'DNS Timed out connecting to {mx} Check your DNS resolver.\n')
+
     except smtplib.SMTPRecipientsRefused:
         logger.debug(f'{mx} refused recipient.\n')
     except smtplib.SMTPHeloError:
