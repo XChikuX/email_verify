@@ -31,7 +31,7 @@ class MXRecord:
             try:
                 mx_records = await DNSResolver.resolve(self.domain, 'MX')
             except (DNS.NXDOMAIN, DNS.NoAnswer, DNS.LifetimeTimeout):
-                raise Exception("DNS entry not found for the domain.")
+                logger.error("DNS entry not found for the domain.")
             else:
                 # Prioritize the MX records in the middle of the list
                 mx_records = sorted(mx_records, key=lambda x: x.preference)  # type: ignore
