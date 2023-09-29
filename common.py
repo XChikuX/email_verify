@@ -1,6 +1,7 @@
 from typing import Tuple, Dict, Callable, Awaitable
 import dns.asyncresolver as DNSResolver, dns.resolver as DNS
 from disposable_email_domains import blocklist
+import aiosmtplib
 import smtplib
 import socket
 import logging
@@ -11,7 +12,7 @@ import pendulum
 FORMAT = "[<->] %(asctime)s |%(process)d| %(message)s"
 
 logging.basicConfig(
-    level="INFO",
+    level="DEBUG",
     format=FORMAT,
     datefmt="%Y-%m-%d %H:%M:%S %z",
     handlers=[RichHandler()],
@@ -109,16 +110,63 @@ async def check_email_deliverability(MX: MXRecord) -> Tuple[bool, str]:
             return True, ""
     return False, "Email address is not deliverable."
 
-async def network_calls(mx, email, timeout=3):
+async def network_calls(mx, email, port=25, timeout=3, use_tls=False):
     ''' Utility function to make network calls to verify email address '''
     result = False
     try:
-        smtp = smtplib.SMTP(mx, timeout=timeout)
+    #     smtp = aiosmtplib.SMTP(hostname=mx, port=port, timeout=timeout, use_tls=use_tls)
+    #     await smtp.connect()
+    #     status, _ = await smtp.ehlo()
+    #     if status >= 400:
+    #         await smtp.quit()
+    #         logger.debug(f'{mx} answer: {status} - {_}\n')
+    #         return False
+    #     await smtp.mail('')
+
+    #     # Upgrade the connection to TLS using STARTTLS
+    #     if port == 587:
+    #         starttls_response = await smtp.starttls()
+    #         if starttls_response.code != 220:
+    #             await smtp.quit()
+    #             logger.debug(f'{mx} answer: {starttls_response.code} - {starttls_response.message.decode()}\n')
+    #             return False
+
+    #     status, _ = await smtp.rcpt(email)
+    #     if status >= 400:
+    #         logger.debug(f'{mx} answer: {status} - {_}\n')
+    #         result = False
+    #     if status >= 200 and status <= 250:
+    #         result = True
+
+    #     logger.debug(f'{mx} answer: {status} - {_}\n')
+    #     await smtp.quit()
+
+    # except aiosmtplib.SMTPRecipientsRefused:
+    #     logger.debug(f'{mx} refused recipient.\n')
+    # except aiosmtplib.SMTPHeloError:
+    #     logger.debug(f'{mx} refused HELO.\n')
+    # except aiosmtplib.SMTPSenderRefused:
+    #     logger.debug(f'{mx} refused sender.\n')
+    # except aiosmtplib.SMTPServerDisconnected:
+    #     logger.debug(f'Server does not permit verify user, {mx} disconnected.\n')
+    # except aiosmtplib.SMTPConnectError as e:
+    #     logger.debug(f'Unable to connect to {mx}.\n {e}')
+
+        smtp = smtplib.SMTP(mx, port=port, timeout=timeout)
         status, _ = smtp.ehlo()
         if status >= 400:
             smtp.quit()
             logger.debug(f'{mx} answer: {status} - {_}\n')
             return False
+
+        # Upgrade the connection to TLS using STARTTLS
+        if port == 587:
+            status, _ = smtp.starttls()
+            if status != 220:
+                smtp.quit()
+                logger.debug(f'{mx} answer: {status} - {_}\n')
+                return False
+
         smtp.mail('')
         status, _ = smtp.rcpt(email)
         if status >= 400:
