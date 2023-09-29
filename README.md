@@ -36,4 +36,4 @@ These instructions will get you a copy of the project up and running on your loc
 To run the server, execute the following command:
 
 ```bash
-hypercorn --bind 0.0.0.0:1234 verify:app
+hypercorn --bind 0.0.0.0:1235 trampoline:trampoline --reload --log-level debug
