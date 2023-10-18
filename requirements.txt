@@ -1,5 +1,5 @@
 charset-normalizer==3.1.0  # Needed cause of a bug in poetry
-urllib3==1.26.17  # Needed cause of a bug in poetry
+urllib3==1.26.18  # Needed cause of a bug in poetry
 dnspython>=2.4.2
 
 fastapi>=0.103.2
