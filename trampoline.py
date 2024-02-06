@@ -1,4 +1,3 @@
-
 from fastapi import FastAPI
 from fastapi.responses import FileResponse, ORJSONResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -14,10 +13,11 @@ from common import (
     domain_validation,
     risk_validation,
     mta_validation,
-    check_email_deliverability
+    check_email_deliverability,
 )
 
 import sentry_sdk
+
 sentry_sdk.init(
     dsn="https://ab18ed27c74dec467fdcab9eccf383b2\
         @o4505872417554432.ingest.sentry.io/4505872417751040",
@@ -30,6 +30,7 @@ sentry_sdk.init(
 class Email(BaseModel):
     email: EmailStr
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Load the FastAPI app
@@ -40,6 +41,7 @@ async def lifespan(app: FastAPI):
         "[bold blue blink]Server is Shutting Down Gracefully![/]",
         extra={"markup": True},
     )
+
 
 origins = [
     "https://psync.dev",
@@ -59,15 +61,17 @@ trampoline.add_middleware(
     allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
-	allow_headers=["*"],
+    allow_headers=["*"],
     max_age=3600,
 )
 # Enable Brotli compression
 trampoline.add_middleware(BrotliMiddleware)
 
+
 @trampoline.get("/")
 async def root():
     return {"message": "Hello World"}
+
 
 @trampoline.get("/favicon.ico")
 async def favicon() -> FileResponse:
@@ -81,25 +85,27 @@ async def process_email(email_address: str) -> Tuple[bool, str]:
         domain_validation,
         risk_validation,
         mta_validation,
-        check_email_deliverability
+        check_email_deliverability,
     ]
     mx = MXRecord(email_address)
     for step in steps:
         is_valid, message = await step(mx)
         if not is_valid:
             return False, message
-    
+
     return True, "Email is valid."
+
 
 # Step 2: Initialize an instance of AsyncEmailCache with process_email as the awaitable
 email_cache = AsyncEmailCache(process_email)
+
 
 # Rate limit this using: https://slowapi.readthedocs.io/en/latest/
 @trampoline.post("/verify_email")
 async def verify_email(email: Email) -> ORJSONResponse:
     # Step 3: Update the verify_email route to use the cache
-    is_valid:bool = False
+    is_valid: bool = False
     message: str = ""
-    is_valid, message = await email_cache(email.email) # type: ignore
+    is_valid, message = await email_cache(email.email)  # type: ignore
     result = "valid" if is_valid else "invalid"
     return ORJSONResponse({"result": result, "message": message})
