@@ -2,7 +2,7 @@
 from fastapi import FastAPI
 from fastapi.responses import FileResponse, ORJSONResponse
 from fastapi.middleware.cors import CORSMiddleware
-from brotli_asgi import BrotliMiddleware
+from brotli_asgi import BrotliMiddleware  # type: ignore
 from pydantic import BaseModel, EmailStr
 from contextlib import asynccontextmanager
 from common import (

@@ -42,9 +42,10 @@ class MXRecord:
 
 # Tiered Cache
 class AsyncEmailCache:
-    def __init__(self, awaitable: Callable[..., Awaitable]):
+    def __init__(self, awaitable: Callable[..., Awaitable], hours: int = 8):
         self._awaitable = awaitable
         self._cache: Dict[str, Dict[str, bool]] = {}  # {domain: {email: is_valid}}
+        self._cache_time: int = hours
         self._timestamps: Dict[str, Dict[str, pendulum.DateTime]] = {}  # {domain: {email: timestamp}}
         self._lock = anyio.Lock()
 
@@ -61,7 +62,7 @@ class AsyncEmailCache:
             if (
                 email not in self._cache[domain]
                 or pendulum.now() - self._timestamps[domain]
-                .get(email, pendulum.now()) > pendulum.duration(hours=8)
+                .get(email, pendulum.now()) > pendulum.duration(hours=self._cache_time)
             ):
                 # If not, then verify the email
                 is_valid = await self._awaitable(email)
@@ -203,9 +204,25 @@ async def network_calls(mx, email, port=25, timeout=3, use_tls=False):
 
 async def send_mail_async():
     # Test the email address
-    smtp = aiosmtplib.SMTP(hostname="gmail.com", port=25, timeout=3)
-    await smtp.connect()
-    await smtp.starttls()
+    import ssl
+    # Create a custom SSL context
+    context = ssl.create_default_context()
+
+    # If you need to trust a custom CA or a self-signed certificate
+    context.load_verify_locations(cafile='./ssl/psync.club.crt')
+
+    # If the server requires client authentication
+    context.load_cert_chain(certfile='./ssl/cert_chain.crt', keyfile='./ssl/psync.club.pem')
+    async with aiosmtplib.SMTP(hostname="alt1.gmail-smtp-in.l.google.com", port=587, use_tls=False, timeout=3, tls_context=context) as smtp:
+        await smtp.connect()
+        await smtp.starttls()
+        status, _ = await smtp.ehlo()
+        if status >= 400:
+            await smtp.quit()
+            print(f'answer: {status} - {_}\n')
+            smtp.close()
+            return False
+        await smtp.mail('')
 
 if __name__ == "__main__":
     loop = asyncio.get_event_loop()
