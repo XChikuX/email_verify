@@ -1,5 +1,5 @@
 # Use a smaller base image for the build stage
-FROM python:3.12.0-slim as build
+FROM python:3.12-alpine AS build
 
 # Set working directory
 WORKDIR /trampoline
@@ -11,7 +11,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Start a new stage to create the final image
-FROM python:3.12.0-slim
+FROM python:3.12-alpine
 
 # Set working directory
 WORKDIR /trampoline

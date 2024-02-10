@@ -1,14 +1,14 @@
 charset-normalizer==3.1.0  # Needed cause of a bug in poetry
 urllib3==1.26.17  # Needed cause of a bug in poetry
-dnspython>=2.4.2
+dnspython>=2.5.0
 
-fastapi>=0.103.2
+fastapi>=0.109.2
 disposable-email-domains>=0.0.95
-pydantic[email]>=2.4.2
-hypercorn>=0.14.4
-sentry-sdk[fastapi]>=1.31.0
-rich>=13.5.3
-pendulum>=3.0.0a1
-orjson>=3.9.7
+pydantic[email]>=2.6.1
+hypercorn>=0.16.0
+sentry-sdk[fastapi]>=1.40.3
+rich>=13.7.0
+pendulum>=3.0.0
+orjson>=3.9.13
 brotli-asgi>=1.4.0
-aiosmtplib>=2.0.2
+aiosmtplib>=3.0.1
