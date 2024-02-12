@@ -21,6 +21,8 @@ COPY *.py .
 
 COPY favicon.ico .
 
+COPY pyproject.toml .
+
 # Copy the Python dependencies installed in the build stage
 COPY --from=build /usr/local/lib/python3.12/site-packages/ /usr/local/lib/python3.12/site-packages/
 
