@@ -55,10 +55,11 @@ origins = [
     "https://psync.dev",
     "https://psync.club",
     "https://psy.nc",
-    "https://psync.app",
     "https://psyncapp.com",
     "https://thedating.club",
     "https://gsrikanth.cc",
+    "https://dbounce.me",
+    "https://dbounce.in",
 ]
 
 trampoline = FastAPI(title="Trampoline", lifespan=lifespan)
