@@ -17,13 +17,7 @@ FROM python:3.12-alpine
 WORKDIR /trampoline
 
 # Copy the Python file
-COPY *.py .
-
-COPY favicon.ico .
-
-COPY pyproject.toml .
-
-COPY /web /web
+COPY . ./
 
 # Copy the Python dependencies installed in the build stage
 COPY --from=build /usr/local/lib/python3.12/site-packages/ /usr/local/lib/python3.12/site-packages/
