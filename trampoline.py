@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.responses import FileResponse, ORJSONResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from brotli_asgi import BrotliMiddleware  # type: ignore
 from pydantic import BaseModel, EmailStr
 from contextlib import asynccontextmanager
@@ -17,6 +18,7 @@ from common import (
 )
 
 import sentry_sdk
+import toml
 
 sentry_sdk.init(
     dsn="https://ab18ed27c74dec467fdcab9eccf383b2\
@@ -24,6 +26,10 @@ sentry_sdk.init(
     traces_sample_rate=0.25,
     profiles_sample_rate=0.25,
 )
+
+"""                VERSION INFO                """
+VERSION: str = toml.load("pyproject.toml")["tool"]["poetry"]["version"]
+logger.debug(f"Psync Version: {VERSION}")
 
 
 ##### MAIN APP########
@@ -34,11 +40,13 @@ class Email(BaseModel):
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Load the FastAPI app
-    logger.info("[bold green blink]Server is Starting Up![/]", extra={"markup": True})
+    logger.info(
+        "[bold green blink]Trampoline is Starting Up![/]", extra={"markup": True}
+    )
     yield
     # Clean up the ML models and release the resources
     logger.info(
-        "[bold blue blink]Server is Shutting Down Gracefully![/]",
+        "[bold blue blink]Trampoline is Shutting Down Gracefully![/]",
         extra={"markup": True},
     )
 
@@ -67,10 +75,14 @@ trampoline.add_middleware(
 # Enable Brotli compression
 trampoline.add_middleware(BrotliMiddleware)
 
+# Mount static files
+trampoline.mount("/web", StaticFiles(directory="web"), name="landing")
 
-@trampoline.get("/")
+
+@trampoline.get("/", include_in_schema=False)
 async def root():
-    return {"message": "Hello World"}
+    """The root of the FastAPI app"""
+    return FileResponse("web/index.html", status_code=200, media_type="text/html")
 
 
 @trampoline.get("/favicon.ico")

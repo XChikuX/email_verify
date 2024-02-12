@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>dbounce.me - Email Bounce Detection</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lexend:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body
+    class="flex flex-col text-blue-950 scroll-smooth webkit-overflow-scrolling-smooth"
+  >
+    <noscript
+      >You need to enable JavaScript on this website to continue.</noscript
+    >
+
+    <div
+      class="relative min-h-screen bg-no-repeat bg-cover"
+      style="background-image: url('background.svg')"
+    >
+      <div class="overflow-y-auto h-full">
+        <header class="flex items-center justify-between p-5">
+          <h1
+            class="text-xl font-bold bg-gradient-to-r from-blue-300 via-orange-700 to-blue-950 bg-clip-text text-transparent"
+          >
+            dbounce.me
+          </h1>
+          <nav>
+            <ul class="flex items-center sm:gap-4 font-semibold">
+              <li>
+                <a
+                  href="/services"
+                  class="text-gray-600 hover:text-blue-500 p-2 sm:p-3 hover:bg-gray-300 hover:ring-1 rounded-xl transition-all delay-100 duration-300"
+                  >Services</a
+                >
+              </li>
+              <li>
+                <a
+                  href="/about"
+                  class="text-gray-600 hover:text-blue-500 p-2 sm:p-3 hover:bg-gray-300 hover:ring-1 rounded-xl transition-all delay-100 duration-300"
+                  >About Us</a
+                >
+              </li>
+              <li>
+                <a
+                  href="/contact"
+                  class="text-gray-600 hover:text-blue-500 p-2 sm:p-3 hover:bg-gray-300 hover:ring-1 rounded-xl transition-all delay-100 duration-300"
+                  >Contact</a
+                >
+              </li>
+            </ul>
+          </nav>
+        </header>
+
+        <main
+          class="flex flex-col items-center justify-center text-center mt-20"
+        >
+          <h2 class="text-6xl font-bold mb-10">
+            Improve Your Email Deliverability
+          </h2>
+          <p class="text-xl text-wrap text-gray-400 mb-2 w-[60%]">
+            Reduce email bounces and reach your audience effectively.
+          </p>
+          <p class="text-xl text-wrap text-gray-400 mb-8 w-[60%]">
+            Ensure your messages are delivered to real inboxes.
+          </p>
+          <div
+            class="flex flex-wrap items-center justify-center gap-4 font-semibold w-[90%] mt-10"
+          >
+            <a
+              href="/features"
+              class="bg-gradient-to-r from-pink-500 to-purple-600 text-red-100 px-4 py-2 rounded-full"
+              >Our Features</a
+            >
+            <a
+              href="/pricing"
+              class="bg-gradient-to-r from-pink-500 to-purple-600 text-red-100 px-4 py-2 rounded-full"
+              >Pricing Plans</a
+            >
+            <a
+              href="/testimonials"
+              class="bg-gradient-to-r from-pink-500 to-purple-600 text-red-100 px-4 py-2 rounded-full"
+              >Testimonials</a
+            >
+          </div>
+        </main>
+
+        <section class="mt-32">
+          <div class="flex flex-wrap justify-center gap-10">
+            <div class="w-2/5 p-6 rounded-xl shadow">
+              <h3 class="text-xl sm:text-3xl font-semibold mb-2">
+                Real-Time Bounce Detection
+              </h3>
+              <p class="text-gray-600">
+                Instantly identify and manage bounced emails with our real-time
+                detection tools.
+              </p>
+            </div>
+            <div class="w-2/5 p-6 rounded-xl shadow">
+              <h3 class="text-xl sm:text-3xl font-semibold mb-2">
+                Advanced Analytics
+              </h3>
+              <p class="text-gray-600">
+                Gain insights into your email performance and optimize your
+                campaigns for better results.
+              </p>
+            </div>
+            <div class="w-2/5 p-6 rounded-xl shadow">
+              <h3 class="text-xl sm:text-3xl font-semibold mb-2">
+                Seamless Integration
+              </h3>
+              <p class="text-gray-600">
+                Easily integrate with your existing email platforms for a smooth
+                workflow.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section class="p-5 mt-24">
+          <h2 class="text-4xl font-bold text-center mb-8">
+            What Our Users Say
+          </h2>
+          <div class="flex flex-wrap justify-center gap-10">
+            <div class="w-4/5 sm:w-2/5 p-6 rounded-lg shadow">
+              <p class="text-gray-600 mb-4">
+                "dbounce.me has significantly reduced our bounce rates,
+                improving our sender reputation!"
+              </p>
+              <p class="font-semibold">- Alex Johnson</p>
+            </div>
+            <div class="w-4/5 sm:w-2/5 p-6 rounded-lg shadow">
+              <p class="text-gray-600 mb-4">
+                "The analytics feature is a game-changer, providing deep
+                insights into our email campaigns."
+              </p>
+              <p class="font-semibold">- Samantha Lee</p>
+            </div>
+          </div>
+        </section>
+
+        <footer
+          class="z-10 flex flex-col justify-between text-center items-center mb-4 mt-32 opacity-90 text-sm sm:text-md font-semibold"
+        >
+          <p class="flex justify-end">
+            Copyright © 2024
+            <a
+              href="#"
+              class="bg-gradient-to-r from-blue-300 via-orange-700 to-blue-950 bg-clip-text text-transparent hover:scale-110 transition-all ease-in-out duration-500"
+              >&nbsp;dbounce.me&nbsp;</a
+            >All Rights Reserved.
+          </p>
+        </footer>
+      </div>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+      function init() {
+        return {
+          handleScroll() {
+            const hideAfter = document.body.scrollHeight * 0.9;
+            if (window.scrollY >= hideAfter) {
+              this.footerVisible = false;
+            } else {
+              this.footerVisible = true;
+            }
+          },
+        };
+      }
+
+      window.onload = function () {
+        var screensImg = document.getElementById("screensImg");
+        if (screensImg) {
+          screensImg.src = "public/screens.svg";
+        }
+      };
+    </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"
+      defer
+    ></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </body>
+</html>
