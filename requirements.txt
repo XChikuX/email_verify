@@ -1,7 +1,7 @@
 charset-normalizer==3.1.0  # Needed cause of a bug in poetry
 urllib3==1.26.17  # Needed cause of a bug in poetry
 dnspython>=2.5.0
-
+toml>=0.10.2
 fastapi>=0.109.2
 disposable-email-domains>=0.0.95
 pydantic[email]>=2.6.1
