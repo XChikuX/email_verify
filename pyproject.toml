@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "trampoline"
-version = "0.99.1"
+version = "0.99.2"
 description = "Check emails?"
 authors = ["Srikanth Gopalakrishnan <srikanth.gokr@gmail.com>"]
 license = "MIT"
@@ -9,21 +9,22 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.9"
 dnspython = "^2.5.0"
-fastapi = "^0.109.2"
+fastapi = "^0.110.1"
 disposable-email-domains = "^0.0.95"
-pydantic = {extras = ["email"], version = "^2.6.1"}
+pydantic = {extras = ["email"], version = "^2.6.4"}
 hypercorn = "^0.16.0"
-sentry-sdk = {extras = ["fastapi"], version = "^1.40.3"}
-rich = "^13.7.0"
+sentry-sdk = {extras = ["fastapi"], version = "^1.44.1"}
+rich = "^13.7.1"
 pendulum = "^3.0.0"
-orjson = "^3.9.13"
+orjson = "^3.10.0"
 brotli-asgi = "^1.4.0"
 aiosmtplib = "^3.0.1"
 toml = "^0.10.2"
+whois = "^1.20240129.2"
 
 [tool.poetry.group.dev.dependencies]
-mypy = "^1.8.0"
-ruff = "^0.2.1"
+mypy = "^1.9.0"
+ruff = "^0.2.2"
 types-toml = "^0.10"
 
 [build-system]

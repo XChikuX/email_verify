@@ -29,7 +29,7 @@ sentry_sdk.init(
 
 """                VERSION INFO                """
 VERSION: str = toml.load("pyproject.toml")["tool"]["poetry"]["version"]
-logger.debug(f"Psync Version: {VERSION}")
+logger.debug(f"Trampoline Version: {VERSION}")
 
 
 ##### MAIN APP########
