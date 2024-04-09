@@ -60,6 +60,7 @@ origins = [
     "https://gsrikanth.cc",
     "https://dbounce.me",
     "https://dbounce.in",
+    "https://dbounce.de",
 ]
 
 trampoline = FastAPI(title="Trampoline", lifespan=lifespan)
