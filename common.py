@@ -1,6 +1,6 @@
 from typing import Tuple, Dict, Callable, Awaitable
 import dns.asyncresolver as DNSResolver, dns.resolver as DNS
-import whois
+import asyncwhois
 from disposable_email_domains import blocklist
 import aiosmtplib
 import asyncio
@@ -81,20 +81,18 @@ class AsyncEmailCache:
 
 
 # Function to calculate the age of the domain
-def calculate_domain_age(domain_name):
-    try:
-        domain_info = whois.whois(domain_name)  # type: ignore
-        # Get the creation date
-        creation_date = domain_info.creation_date
-        # If the creation_date is a list (multiple values), take the first one
-        if isinstance(creation_date, list):
-            creation_date = creation_date[0]
-        # Calculate the age
-        current_date = pendulum.now("UTC")
-        age = current_date.diff(creation_date).in_years()
-        return age  # Return the age in years
-    except Exception as e:
-        return str(e)
+async def calculate_domain_age(domain_name) -> int:
+    domain_info = await asyncwhois.aio_whois(domain_name)
+    # Get the creation date
+    logger.info(domain_info)
+    creation_date = domain_info["created"]
+    # If the creation_date is a list (multiple values), take the first one
+    if isinstance(creation_date, list):
+        creation_date = creation_date[0]
+    # Calculate the age
+    current_date = pendulum.now("UTC")
+    age = int(current_date.diff(creation_date).in_years())
+    return age  # Return the age in years
 
 
 async def deduplication_and_spam_removal(mx: MXRecord) -> Tuple[bool, str]:
@@ -106,6 +104,8 @@ async def deduplication_and_spam_removal(mx: MXRecord) -> Tuple[bool, str]:
 async def domain_validation(mx: MXRecord) -> Tuple[bool, str]:
     try:
         await DNSResolver.resolve(mx.domain, "A")
+        if await calculate_domain_age(mx.domain) < 1:
+            return False, "Domain is less than 1 year old."
         return True, ""
     except (DNS.NXDOMAIN, DNS.LifetimeTimeout):
         return False, "DNS entry not found for the domain."
