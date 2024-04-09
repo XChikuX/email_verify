@@ -135,7 +135,7 @@ async def check_email_deliverability(MX: MXRecord) -> Tuple[bool, str]:
     return False, "Email address is not deliverable."
 
 
-async def network_calls(mx, email, port=25, timeout=3, use_tls=False):
+async def network_calls(mx, email, port=587, timeout=3, use_tls=True):
     """Utility function to make network calls to verify email address"""
     result = False
     try:
@@ -155,7 +155,7 @@ async def network_calls(mx, email, port=25, timeout=3, use_tls=False):
             if starttls_response.code != 220:
                 await smtp.quit()
                 logger.debug(
-                    f"{mx} answer: {starttls_response.code} - {starttls_response.message.decode()}\n"
+                    f"{mx} answer: {starttls_response.code} - {starttls_response.message}\n"
                 )
                 return False
 
@@ -170,6 +170,7 @@ async def network_calls(mx, email, port=25, timeout=3, use_tls=False):
         await smtp.quit()
 
     except aiosmtplib.SMTPRecipientsRefused:
+        result = False
         logger.debug(f"{mx} refused recipient.\n")
     except aiosmtplib.SMTPHeloError:
         logger.debug(f"{mx} refused HELO.\n")
