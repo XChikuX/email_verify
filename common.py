@@ -82,10 +82,11 @@ class AsyncEmailCache:
 
 # Function to calculate the age of the domain
 async def calculate_domain_age(domain_name) -> int:
+    "TODO: Fix some issue in this"
     domain_info = await asyncwhois.aio_whois(domain_name)
     # Get the creation date
     logger.info(domain_info)
-    creation_date = domain_info["created"]
+    creation_date = domain_info["created"]  # <------ FIX THIS
     # If the creation_date is a list (multiple values), take the first one
     if isinstance(creation_date, list):
         creation_date = creation_date[0]
@@ -104,8 +105,9 @@ async def deduplication_and_spam_removal(mx: MXRecord) -> Tuple[bool, str]:
 async def domain_validation(mx: MXRecord) -> Tuple[bool, str]:
     try:
         await DNSResolver.resolve(mx.domain, "A")
-        if await calculate_domain_age(mx.domain) < 1:
-            return False, "Domain is less than 1 year old."
+        # TODO: FIX THIS
+        # if await calculate_domain_age(mx.domain) < 1:
+        #     return False, "Domain is less than 1 year old."
         return True, ""
     except (DNS.NXDOMAIN, DNS.LifetimeTimeout):
         return False, "DNS entry not found for the domain."
