@@ -135,7 +135,7 @@ async def check_email_deliverability(MX: MXRecord) -> Tuple[bool, str]:
     return False, "Email address is not deliverable."
 
 
-async def network_calls(mx, email, port=587, timeout=3, use_tls=True):
+async def network_calls(mx, email, port=25, timeout=3, use_tls=False):
     """Utility function to make network calls to verify email address"""
     result = False
     try:
@@ -150,6 +150,7 @@ async def network_calls(mx, email, port=587, timeout=3, use_tls=True):
 
         # Upgrade the connection to TLS using STARTTLS
         if port == 587:
+            logger.info("Upgrading connection to TLS")
             starttls_response = await smtp.starttls(validate_certs=False)
             # starttls_response = await smtp.starttls()
             if starttls_response.code != 220:
