@@ -170,9 +170,10 @@ async def network_calls(mx, email, port=25, timeout=3, use_tls=False):
         logger.debug(f"{mx} answer: {status} - {_}\n")
         await smtp.quit()
 
-    except aiosmtplib.SMTPRecipientsRefused:
-        result = False
+    except aiosmtplib.SMTPRecipientRefused:
         logger.debug(f"{mx} refused recipient.\n")
+    except aiosmtplib.SMTPRecipientsRefused:
+        logger.debug(f"{mx} refused multiple recipients.\n")
     except aiosmtplib.SMTPHeloError:
         logger.debug(f"{mx} refused HELO.\n")
     except aiosmtplib.SMTPSenderRefused:
@@ -245,7 +246,7 @@ async def send_mail_async():
     async with aiosmtplib.SMTP(
         hostname="alt1.gmail-smtp-in.l.google.com",
         port=587,
-        use_tls=False,
+        use_tls=True,
         timeout=3,
         tls_context=context,
     ) as smtp:
