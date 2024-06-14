@@ -1,22 +1,22 @@
 [tool.poetry]
 name = "trampoline"
-version = "0.99.2"
+version = "0.99.3"
 description = "Check emails?"
 authors = ["Srikanth Gopalakrishnan <srikanth.gokr@gmail.com>"]
 license = "MIT"
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.12"
 dnspython = "^2.5.0"
-fastapi = "^0.110.1"
+fastapi = "^0.111"
 disposable-email-domains = "^0.0.95"
 pydantic = {extras = ["email"], version = "^2.6.4"}
-hypercorn = "^0.16.0"
+hypercorn = "^0.17"
 sentry-sdk = {extras = ["fastapi"], version = "^1.44.1"}
 rich = "^13.7.1"
 pendulum = "^3.0.0"
-orjson = "^3.10.0"
+orjson = "^3.10"
 brotli-asgi = "^1.4.0"
 aiosmtplib = "^3.0.1"
 toml = "^0.10.2"
