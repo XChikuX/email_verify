@@ -1,11 +1,10 @@
 from typing import Tuple, Dict, Callable, Awaitable
-import dns.asyncresolver as DNSResolver, dns.resolver as DNS
-import asyncwhois
+import dns.asyncresolver as DNSResolver
+import dns.resolver as DNS
+import asyncwhois  # type: ignore
 from disposable_email_domains import blocklist
 import aiosmtplib
 import asyncio
-import smtplib
-import socket
 import logging
 from rich.logging import RichHandler
 import anyio
@@ -109,7 +108,7 @@ async def domain_validation(mx: MXRecord) -> Tuple[bool, str]:
         # if await calculate_domain_age(mx.domain) < 1:
         #     return False, "Domain is less than 1 year old."
         return True, ""
-    except (DNS.NXDOMAIN, DNS.LifetimeTimeout):
+    except (DNS.NXDOMAIN, DNS.LifetimeTimeout, DNSResolver.NoAnswer):
         return False, "DNS entry not found for the domain."
 
 

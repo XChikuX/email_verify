@@ -7,7 +7,7 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisites
 
-- Python 3.9+
+- Python 3.12+
 - FastAPI
 - Hypercorn
 - Other dependencies... (see pyproject.toml)
